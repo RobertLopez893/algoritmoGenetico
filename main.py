@@ -66,6 +66,7 @@ cont = 1
 
 start = time.time()
 
+# Ciclo while que genera poblaciones hasta que se genere un individuo perfecto
 while [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9] not in population.values():
     print(f"Generación {cont}:")
     print(population)
