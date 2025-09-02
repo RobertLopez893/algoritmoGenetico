@@ -28,14 +28,14 @@ def reproduction(individuals):
         y = random.choice(av_keys)
 
         if x == y:
-            print("Son iguales, imposible realizar.")
+            # print("Son iguales, imposible realizar.")
             continue
 
         h1 = []
         h2 = []
 
         if (individuals[x]["padres"] == individuals[y]["padres"]) and (individuals[x]["padres"] is not None):
-            print(f"{x} y {y} son hermanos, imposible realizar.")
+            # print(f"{x} y {y} son hermanos, imposible realizar.")
             continue
 
         for j in range(0, 20, 1):
