@@ -24,33 +24,36 @@ def reproduction(individuals):
     av_keys = list(individuals.keys())
 
     while len(av_keys) > 1:
+        x = random.choice(av_keys)
+        y = random.choice(av_keys)
+
+        if x == y:
+            print("Son iguales, imposible realizar.")
+            continue
+
         h1 = []
         h2 = []
 
-        x = random.choice(av_keys)
-
-        y = random.choice(av_keys)
-
-        if (individuals[x]["padres"] == individuals[y]["padres"]) and (individuals[x]["padres"] and individuals[y]["padres"] is not None):
+        if (individuals[x]["padres"] == individuals[y]["padres"]) and (individuals[x]["padres"] is not None):
+            print(f"{x} y {y} son hermanos, imposible realizar.")
             continue
 
-        flag = 0
         for j in range(0, 20, 1):
-            if flag % 2 == 0:
-                h1.append(math.ceil(((individuals[x][j] + individuals[y][j]) / 2)))
-                h2.append(math.ceil(((individuals[x][j] + individuals[y][j]) / 2)))
+            new_genes = (individuals[x]["genes"][j] + individuals[y]["genes"][j]) / 2
+            if j % 2 == 0:
+                h1.append(math.ceil(new_genes))
+                h2.append(math.ceil(new_genes))
             else:
-                h1.append(math.floor(((individuals[x][j] + individuals[y][j]) / 2)))
-                h2.append(math.floor(((individuals[x][j] + individuals[y][j]) / 2)))
+                h1.append(math.floor(new_genes))
+                h2.append(math.floor(new_genes))
 
-        del individuals[x]
-        del individuals[y]
-
-        new_gen[len(new_gen) + 1] = h1
-        new_gen[len(new_gen) + 1] = h2
+        new_gen[len(new_gen) + 1] = {"genes": h1, "padres": [x, y]}
+        new_gen[len(new_gen) + 1] = {"genes": h2, "padres": [x, y]}
 
         av_keys.remove(x)
         av_keys.remove(y)
+
+        print(f"{x} y {y} eliminados. Solo quedan {len(av_keys)}.")
 
     return new_gen
 
@@ -63,13 +66,14 @@ cont = 1
 
 start = time.time()
 
-#while [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9] not in population.values():
-for i in range(0, 10, 1):
+while [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9] not in population.values():
     print(f"Generación {cont}:")
     print(population)
     print("Longitud de la población:", len(population))
     population = reproduction(population)
     cont += 1
+
+print(f"Encontramos al individuo perfecto en la generación {cont}.")
 
 end = time.time()
 print(f"Tiempo total: {end - start}")
