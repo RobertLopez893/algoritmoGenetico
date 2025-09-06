@@ -19,18 +19,22 @@ def generate_pop():
 
 
 def check_relation(i1, i2):
-    if i1["padres"] is not None and i2["padres"] is not None:
-        if i1["padres"] == i2["padres"]:
+    if i1["padres"] and i1["padres"] == i2["padres"]:
+        return True
+
+    if i1["abuelos"] and i2["abuelos"]:
+        abuelos_i1 = [par for par in i1["abuelos"] if par is not None]
+        abuelos_i2 = [par for par in i2["abuelos"] if par is not None]
+
+        if any(par_abuelos in abuelos_i2 for par_abuelos in abuelos_i1):
             return True
-    if i1["abuelos"] is not None and i2["abuelos"] is not None:
-        if i1["abuelos"] != [None, None] and i2["abuelos"] != [None, None]:
-            if i1["abuelos"] == i2["abuelos"]:
-                return True
-    if i1["bisabuelos"] is not None and i2["bisabuelos"] is not None:
-        if i1["bisabuelos"] != [None, None] and i2["bisabuelos"] != [None, None]:
-            if i1["bisabuelos"] != [[None, None], [None, None]] and i2["bisabuelos"] != [[None, None], [None, None]]:
-                if i1["bisabuelos"] == i2["bisabuelos"]:
-                    return True
+    if i1["bisabuelos"] and i2["bisabuelos"]:
+        bisabuelos_i1 = [par for sublist in i1["bisabuelos"] if sublist for par in sublist if par is not None]
+        bisabuelos_i2 = [par for sublist in i2["bisabuelos"] if sublist for par in sublist if par is not None]
+
+        if any(par_bisabuelos in bisabuelos_i2 for par_bisabuelos in bisabuelos_i1):
+            return True
+
     return False
 
 
