@@ -28,6 +28,7 @@ def check_relation(i1, i2):
 
         if any(par_abuelos in abuelos_i2 for par_abuelos in abuelos_i1):
             return True
+
     if i1["bisabuelos"] and i2["bisabuelos"]:
         bisabuelos_i1 = [par for sublist in i1["bisabuelos"] if sublist for par in sublist if par is not None]
         bisabuelos_i2 = [par for sublist in i2["bisabuelos"] if sublist for par in sublist if par is not None]
@@ -36,6 +37,36 @@ def check_relation(i1, i2):
             return True
 
     return False
+
+
+# Función que efectúa la mutación
+def mutation(individual):
+    if random.random() < 0.1:
+        # print("Se efectúo mutación.")
+        # print("Original:", individual["genes"])
+        indexes = random.sample(range(20), 2)
+
+        for idx in indexes:
+            individual["genes"][idx] = random.randint(1, 9)
+
+        # print("Mutación:", individual["genes"])
+
+    return individual
+
+
+# Función para calcular la aptitud
+def aptitude_calc(individual):
+    return sum(1 for gen in individual["genes"] if gen == 9)
+
+
+# Función de selección para los padres
+def tournament_selection(individuals, tournament_size=3):
+    selected = random.sample(list(individuals.items()), tournament_size)
+
+    # Seleccionar el individuo con mayor aptitud
+    winner = max(selected, key=lambda ind: aptitude_calc(ind[1]))
+
+    return winner[0]  # Devolvemos el ID del ganador
 
 
 # Lógica de la reproducción aleatoria de los individuos
@@ -52,7 +83,7 @@ def reproduction(individuals):
             continue
 
         if check_relation(individuals[x], individuals[y]):
-            #print(f"Son hermanos/primos ({x}, {y}), imposible realizar.")
+            # print(f"Son hermanos/primos ({x}, {y}), imposible realizar.")
             continue
 
         h1 = []
@@ -74,10 +105,13 @@ def reproduction(individuals):
                                      "abuelos": [individuals[x]["padres"], individuals[y]["padres"]],
                                      "bisabuelos": [individuals[x]["abuelos"], individuals[y]["abuelos"]]}
 
+        new_gen[len(new_gen)] = mutation(new_gen[len(new_gen)])
+        new_gen[len(new_gen) - 1] = mutation(new_gen[len(new_gen) - 1])
+
         av_keys.remove(x)
         av_keys.remove(y)
 
-        print(f"{x} y {y} eliminados. Solo quedan {len(av_keys)}.")
+        # print(f"{x} y {y} eliminados. Solo quedan {len(av_keys)}.")
 
     return new_gen
 
