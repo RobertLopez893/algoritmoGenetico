@@ -13,9 +13,25 @@ def generate_pop():
         ind = []
         for j in range(0, 20, 1):
             ind.append(random.randint(1, 9))
-        new_pop[i + 1] = {"genes": ind, "padres": None}
+        new_pop[i + 1] = {"genes": ind, "padres": None, "abuelos": None, "bisabuelos": None}
 
     return new_pop
+
+
+def check_relation(i1, i2):
+    if i1["padres"] is not None and i2["padres"] is not None:
+        if i1["padres"] == i2["padres"]:
+            return True
+    if i1["abuelos"] is not None and i2["abuelos"] is not None:
+        if i1["abuelos"] != [None, None] and i2["abuelos"] != [None, None]:
+            if i1["abuelos"] == i2["abuelos"]:
+                return True
+    if i1["bisabuelos"] is not None and i2["bisabuelos"] is not None:
+        if i1["bisabuelos"] != [None, None] and i2["bisabuelos"] != [None, None]:
+            if i1["bisabuelos"] != [[None, None], [None, None]] and i2["bisabuelos"] != [[None, None], [None, None]]:
+                if i1["bisabuelos"] == i2["bisabuelos"]:
+                    return True
+    return False
 
 
 # Lógica de la reproducción aleatoria de los individuos
@@ -31,12 +47,12 @@ def reproduction(individuals):
             # print("Son iguales, imposible realizar.")
             continue
 
+        if check_relation(individuals[x], individuals[y]):
+            #print(f"Son hermanos/primos ({x}, {y}), imposible realizar.")
+            continue
+
         h1 = []
         h2 = []
-
-        if (individuals[x]["padres"] == individuals[y]["padres"]) and (individuals[x]["padres"] is not None):
-            # print(f"{x} y {y} son hermanos, imposible realizar.")
-            continue
 
         for j in range(0, 20, 1):
             new_genes = (individuals[x]["genes"][j] + individuals[y]["genes"][j]) / 2
@@ -47,8 +63,12 @@ def reproduction(individuals):
                 h1.append(math.floor(new_genes))
                 h2.append(math.floor(new_genes))
 
-        new_gen[len(new_gen) + 1] = {"genes": h1, "padres": [x, y]}
-        new_gen[len(new_gen) + 1] = {"genes": h2, "padres": [x, y]}
+        new_gen[len(new_gen) + 1] = {"genes": h1, "padres": [x, y],
+                                     "abuelos": [individuals[x]["padres"], individuals[y]["padres"]],
+                                     "bisabuelos": [individuals[x]["abuelos"], individuals[y]["abuelos"]]}
+        new_gen[len(new_gen) + 1] = {"genes": h2, "padres": [x, y],
+                                     "abuelos": [individuals[x]["padres"], individuals[y]["padres"]],
+                                     "bisabuelos": [individuals[x]["abuelos"], individuals[y]["abuelos"]]}
 
         av_keys.remove(x)
         av_keys.remove(y)
