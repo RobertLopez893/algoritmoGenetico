@@ -18,6 +18,14 @@ def generate_pop():
     return new_pop
 
 
+# Verificamos si se encontró al individuo perfecto
+def check_goal(individuals):
+    for individual in individuals.values():
+        if individual["genes"] == [9] * 20:
+            return True
+    return False
+
+
 def check_relation(i1, i2):
     if i1["padres"] and i1["padres"] == i2["padres"]:
         return True
@@ -52,21 +60,6 @@ def mutation(individual):
         # print("Mutación:", individual["genes"])
 
     return individual
-
-
-# Función para calcular la aptitud
-def aptitude_calc(individual):
-    return sum(1 for gen in individual["genes"] if gen == 9)
-
-
-# Función de selección para los padres
-def tournament_selection(individuals, tournament_size=3):
-    selected = random.sample(list(individuals.items()), tournament_size)
-
-    # Seleccionar el individuo con mayor aptitud
-    winner = max(selected, key=lambda ind: aptitude_calc(ind[1]))
-
-    return winner[0]  # Devolvemos el ID del ganador
 
 
 # Lógica de la reproducción aleatoria de los individuos
@@ -125,7 +118,7 @@ cont = 1
 start = time.time()
 
 # Ciclo while que genera poblaciones hasta que se genere un individuo perfecto
-while [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9] not in population.values():
+while not check_goal(population):
     print(f"Generación {cont}:")
     print(population)
     print("Longitud de la población:", len(population))
