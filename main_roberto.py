@@ -26,6 +26,7 @@ def check_goal(individuals):
     return False
 
 
+# Evitar el incesto
 def check_relation(i1, i2):
     if i1["padres"] and i1["padres"] == i2["padres"]:
         return True
@@ -49,7 +50,7 @@ def check_relation(i1, i2):
 
 # Función que efectúa la mutación
 def mutation(individual):
-    if random.random() < 0.01:
+    if random.random() < 0.1:
         # print("Se efectúo mutación.")
         # print("Original:", individual["genes"])
         indexes = random.sample(range(20), 2)
@@ -79,39 +80,53 @@ def cross(p1, p2):
     return h1, h2
 
 
-# Lógica de la reproducción aleatoria de los individuos
+# Evaluación del fitness
+def fitness(individual):
+    return sum(individual["genes"])
+
+
+# Lógica de la reproducción no tan aleatoria de los individuos
 def reproduction(individuals):
     new_gen = {}
     av_keys = list(individuals.keys())
+    random.shuffle(av_keys)  # Barajar para que la selección inicial sea aleatoria
 
-    while len(av_keys) > 1:
-        x = random.choice(av_keys)
-        y = random.choice(av_keys)
+    while len(av_keys) >= 2:
+        # 1. Tomar el primer individuo disponible
+        p1_key = av_keys.pop(0)
+        p1 = individuals[p1_key]
 
-        if x == y:
-            # print("Son iguales, imposible realizar.")
-            continue
+        # 2. Buscar activamente candidatos no familiares
+        candidates = []
+        for key in av_keys:
+            if not check_relation(p1, individuals[key]):
+                candidates.append(key)
 
-        if check_relation(individuals[x], individuals[y]):
-            # print(f"Son hermanos/primos ({x}, {y}), imposible realizar.")
-            continue
+        p2_key = None
+        # 3. Decidir si se encontró una pareja válida o si hay que forzarla
+        if candidates:
+            # Si hay candidatos, elegir uno al azar
+            p2_key = random.choice(candidates)
+        else:
+            # Si NO hay candidatos, forzar la pareja con el primero que quede
+            if av_keys:  # Asegurarse de que todavía hay alguien
+                p2_key = av_keys[0]
+                print(f"ADVERTENCIA: No hay parejas no familiares para {p1_key}. Forzando reproducción con {p2_key}.")
 
-        h1, h2 = cross(individuals[x], individuals[y])
+        if p2_key:
+            p2 = individuals[p2_key]
+            av_keys.remove(p2_key)  # Eliminar a la pareja de la lista de disponibles
 
-        new_gen[len(new_gen) + 1] = {"genes": h1, "padres": [x, y],
-                                     "abuelos": [individuals[x]["padres"], individuals[y]["padres"]],
-                                     "bisabuelos": [individuals[x]["abuelos"], individuals[y]["abuelos"]]}
-        new_gen[len(new_gen) + 1] = {"genes": h2, "padres": [x, y],
-                                     "abuelos": [individuals[x]["padres"], individuals[y]["padres"]],
-                                     "bisabuelos": [individuals[x]["abuelos"], individuals[y]["abuelos"]]}
+            # 4. Cruzar y crear los hijos
+            h1, h2 = cross(p1, p2)
 
-        new_gen[len(new_gen)] = mutation(new_gen[len(new_gen)])
-        new_gen[len(new_gen) - 1] = mutation(new_gen[len(new_gen) - 1])
+            child1 = {"genes": h1, "padres": [p1_key, p2_key], "abuelos": [p1["padres"], p2["padres"]],
+                      "bisabuelos": [p1["abuelos"], p2["abuelos"]]}
+            child2 = {"genes": h2, "padres": [p1_key, p2_key], "abuelos": [p1["padres"], p2["padres"]],
+                      "bisabuelos": [p1["abuelos"], p2["abuelos"]]}
 
-        av_keys.remove(x)
-        av_keys.remove(y)
-
-        # print(f"{x} y {y} eliminados. Solo quedan {len(av_keys)}.")
+            new_gen[len(new_gen) + 1] = mutation(child1)
+            new_gen[len(new_gen) + 1] = mutation(child2)
 
     return new_gen
 
@@ -131,6 +146,10 @@ while not check_goal(population):
     print("Longitud de la población:", len(population))
     population = reproduction(population)
     cont += 1
+
+print(f"Generación {cont}:")
+print(population)
+print("Longitud de la población:", len(population))
 
 print(f"Encontramos al individuo perfecto en la generación {cont}.")
 
