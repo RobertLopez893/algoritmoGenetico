@@ -50,9 +50,10 @@ def check_relation(i1, i2):
 
 # Función que efectúa la mutación
 def mutation(individual):
-    if random.random() < 0.01:
-        idx = random.randrange(20)
-        individual["genes"][idx] = random.randint(1, 9)
+    if random.random() < 0.1:
+        indexes = random.sample(range(20), 2)
+        for idx in indexes:
+            individual["genes"][idx] = random.randint(1, 9)
     return individual
 
 
