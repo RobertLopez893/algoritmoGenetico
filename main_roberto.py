@@ -51,33 +51,29 @@ def check_relation(i1, i2):
 # Función que efectúa la mutación
 def mutation(individual):
     if random.random() < 0.1:
-        # print("Se efectúo mutación.")
-        # print("Original:", individual["genes"])
-        indexes = random.sample(range(20), 2)
-
-        for idx in indexes:
-            individual["genes"][idx] = random.randint(1, 9)
-
-        # print("Mutación:", individual["genes"])
-
+        idx = random.randrange(20)
+        individual["genes"][idx] = random.randint(1, 9)
     return individual
 
 
 # Cruza entre los padres
 def cross(p1, p2):
-    h1 = []
-    h2 = []
+    h1_genes, h2_genes = [], []
 
-    for j in range(0, 20, 1):
-        new_genes = (p1["genes"][j] + p2["genes"][j]) / 2
-        if j % 2 == 0:
-            h1.append(math.ceil(new_genes))
-            h2.append(math.ceil(new_genes))
+    for j, (g1, g2) in enumerate(zip(p1["genes"], p2["genes"])):
+        if g1 == 9:
+            h1_genes.append(9)
+            h2_genes.append(max(g2, random.randint(7, 9)))
+        elif g2 == 9:
+            h1_genes.append(max(g1, random.randint(7, 9)))
+            h2_genes.append(9)
         else:
-            h1.append(math.floor(new_genes))
-            h2.append(math.floor(new_genes))
+            new_genes = (g1 + g2) / 2
+            val = math.ceil(new_genes) if j % 2 == 0 else math.floor(new_genes)
+            h1_genes.append(val)
+            h2_genes.append(val)
 
-    return h1, h2
+    return h1_genes, h2_genes
 
 
 # Evaluación del fitness
@@ -85,39 +81,30 @@ def fitness(individual):
     return sum(individual["genes"])
 
 
-# Lógica de la reproducción no tan aleatoria de los individuos
+# Lógica de la reproducción con selección del mejor candidato
 def reproduction(individuals):
     new_gen = {}
     av_keys = list(individuals.keys())
-    random.shuffle(av_keys)  # Barajar para que la selección inicial sea aleatoria
+    random.shuffle(av_keys)
 
     while len(av_keys) >= 2:
-        # 1. Tomar el primer individuo disponible
         p1_key = av_keys.pop(0)
         p1 = individuals[p1_key]
 
-        # 2. Buscar activamente candidatos no familiares
-        candidates = []
-        for key in av_keys:
-            if not check_relation(p1, individuals[key]):
-                candidates.append(key)
+        candidates = [key for key in av_keys if not check_relation(p1, individuals[key])]
 
         p2_key = None
-        # 3. Decidir si se encontró una pareja válida o si hay que forzarla
         if candidates:
-            # Si hay candidatos, elegir uno al azar
-            p2_key = random.choice(candidates)
+            p2_key = max(candidates, key=lambda k: fitness(individuals[k]))
         else:
-            # Si NO hay candidatos, forzar la pareja con el primero que quede
-            if av_keys:  # Asegurarse de que todavía hay alguien
+            if av_keys:
                 p2_key = av_keys[0]
-                print(f"ADVERTENCIA: No hay parejas no familiares para {p1_key}. Forzando reproducción con {p2_key}.")
+                print(f"ADVERTENCIA: Forzando reproducción para {p1_key} con {p2_key}.")
 
         if p2_key:
             p2 = individuals[p2_key]
-            av_keys.remove(p2_key)  # Eliminar a la pareja de la lista de disponibles
+            av_keys.remove(p2_key)
 
-            # 4. Cruzar y crear los hijos
             h1, h2 = cross(p1, p2)
 
             child1 = {"genes": h1, "padres": [p1_key, p2_key], "abuelos": [p1["padres"], p2["padres"]],
