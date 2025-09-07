@@ -49,7 +49,7 @@ def check_relation(i1, i2):
 
 # Función que efectúa la mutación
 def mutation(individual):
-    if random.random() < 0.1:
+    if random.random() < 0.01:
         # print("Se efectúo mutación.")
         # print("Original:", individual["genes"])
         indexes = random.sample(range(20), 2)
@@ -60,6 +60,23 @@ def mutation(individual):
         # print("Mutación:", individual["genes"])
 
     return individual
+
+
+# Cruza entre los padres
+def cross(p1, p2):
+    h1 = []
+    h2 = []
+
+    for j in range(0, 20, 1):
+        new_genes = (p1["genes"][j] + p2["genes"][j]) / 2
+        if j % 2 == 0:
+            h1.append(math.ceil(new_genes))
+            h2.append(math.ceil(new_genes))
+        else:
+            h1.append(math.floor(new_genes))
+            h2.append(math.floor(new_genes))
+
+    return h1, h2
 
 
 # Lógica de la reproducción aleatoria de los individuos
@@ -79,17 +96,7 @@ def reproduction(individuals):
             # print(f"Son hermanos/primos ({x}, {y}), imposible realizar.")
             continue
 
-        h1 = []
-        h2 = []
-
-        for j in range(0, 20, 1):
-            new_genes = (individuals[x]["genes"][j] + individuals[y]["genes"][j]) / 2
-            if j % 2 == 0:
-                h1.append(math.ceil(new_genes))
-                h2.append(math.ceil(new_genes))
-            else:
-                h1.append(math.floor(new_genes))
-                h2.append(math.floor(new_genes))
+        h1, h2 = cross(individuals[x], individuals[y])
 
         new_gen[len(new_gen) + 1] = {"genes": h1, "padres": [x, y],
                                      "abuelos": [individuals[x]["padres"], individuals[y]["padres"]],
