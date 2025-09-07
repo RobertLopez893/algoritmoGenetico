@@ -50,7 +50,7 @@ def check_relation(i1, i2):
 
 # Función que efectúa la mutación
 def mutation(individual):
-    if random.random() < 0.1:
+    if random.random() < 0.01:
         # print("Mutación efectuada.")
         indexes = random.sample(range(20), 2)
         for idx in indexes:
@@ -101,7 +101,7 @@ def reproduction(individuals):
         else:
             if av_keys:
                 p2_key = av_keys[0]
-                print(f"ADVERTENCIA: Forzando reproducción para {p1_key} con {p2_key}.")
+                # print(f"ADVERTENCIA: Forzando reproducción para {p1_key} con {p2_key}.")
 
         if p2_key:
             p2 = individuals[p2_key]
