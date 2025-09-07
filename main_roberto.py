@@ -50,7 +50,7 @@ def check_relation(i1, i2):
 
 # Función que efectúa la mutación
 def mutation(individual):
-    if random.random() < 0.1:
+    if random.random() < 0.01:
         indexes = random.sample(range(20), 2)
         for idx in indexes:
             individual["genes"][idx] = random.randint(1, 9)
@@ -69,10 +69,16 @@ def cross(p1, p2):
             h1_genes.append(max(g1, random.randint(7, 9)))
             h2_genes.append(9)
         else:
-            new_genes = (g1 + g2) / 2
-            val = math.ceil(new_genes) if j % 2 == 0 else math.floor(new_genes)
-            h1_genes.append(val)
-            h2_genes.append(val)
+            # new_genes = (g1 + g2) / 2
+            # val = math.ceil(new_genes) if j % 2 == 0 else math.floor(new_genes)
+            # h1_genes.append(val)
+            # h2_genes.append(val)
+            if random.randint(0, 1) == 1:
+                h1_genes.append(g1)
+                h2_genes.append(g2)
+            else:
+                h1_genes.append(g2)
+                h2_genes.append(g1)
 
     return h1_genes, h2_genes
 
