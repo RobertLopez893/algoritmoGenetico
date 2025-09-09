@@ -1,4 +1,12 @@
-# Práctica 2: Generación de Poblaciones
+# Práctica 2: Algoritmo Genético
+
+"""
+Integrantes:
+- Sánchez Diego Isaac
+- López Reyes José Roberto
+- Pérez Rosales Luis Eladio
+- Torres Cortes Carlos Fernando
+"""
 
 import random
 import time
